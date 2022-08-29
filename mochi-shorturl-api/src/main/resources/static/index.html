@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>长短链接转换</title>
+    <script src="js/jquery-3.5.1.min.js"></script>
+    <title>Title</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #main {
+            width: 70%;
+            height: 30%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        body {
+            text-align: center;
+            background-image: url('/pic/background-1.jpeg');
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+            background-attachment: fixed;
+        }
+
+        body::after {
+            opacity: 0.5;
+        }
+    </style>
+    <script type="text/javascript">
+        function convert() {
+            if ($("#longUrl").val() == undefined || $("#longUrl").val() == null || $("#longUrl").val() == '') {
+                alert("长链接不能为空！");
+                return;
+            }
+            var param = {'longUrl': $("#longUrl").val()}
+            $.ajax({
+                method: "POST",
+                url: "/shorturl/add",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(param),
+                success: function (result) {
+                    if (result.code == '0000') {
+                        $("#shortUrl").val(result.data);
+                    } else {
+                        alert(result.msg);
+                    }
+                }
+            })
+        }
+
+        function recover() {
+            if ($("#shortUrl").val() == undefined || $("#shortUrl").val() == null || $("#shortUrl").val() == '') {
+                alert("短链接不能为空！");
+                return;
+            }
+            $.ajax({
+                method: "GET",
+                url: "/shorturl/recover?shortUrl=" + $("#shortUrl").val(),
+                dataType: "json",
+                success: function (result) {
+                    if (result.code == '0000') {
+                        $("#longUrl").val(result.data);
+                    } else {
+                        alert(result.msg);
+                    }
+                }
+            })
+        }
+
+        function clickCopy() {
+            var Url2 = $("#shortUrl").val();
+            var oInput = document.createElement('input');
+            oInput.value = Url2;
+            document.body.appendChild(oInput);
+            oInput.select(); // 选择对象
+            document.execCommand("Copy"); // 执行浏览器复制命令
+            oInput.className = 'oInput';
+            oInput.style.display = 'none';
+            alert('复制成功');
+        }
+    </script>
+</head>
+<body>
+<table id="main" style="background: rgb(191,229,243)">
+    <tr>
+        <td>
+            <input placeholder="请输入长链接" id="longUrl"
+                   style="width: 50%;height: 20%;border: none;outline:none;font-size: 16px"><input
+                type="button"
+                value="转换"
+                onclick="convert()"
+                style="width: 10%;height: 20%;border: none;background-color: #ff8877;color: white;">
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <input placeholder="请输入短链接" id="shortUrl"
+                   style="width: 40%;height: 20%;border: none;outline:none;font-size: 16px"><input
+                type="button"
+                value="还原"
+                onclick="recover()"
+                style="width: 10%;height: 20%;border: none;background-color: #ff8877;color: white;"><input
+                type="button"
+                value="一键复制"
+                onclick="clickCopy()"
+                style="width: 10%;height: 20%;border: none;background-color:transparent;color: white;">
+        </td>
+    </tr>
+</table>
+
+<footer style="width:100%;color:white;position: absolute;background: gray;bottom: 0">沪ICP备2021036793号-1
+    @2022Mochi
+</footer>
+</body>
+</html>
